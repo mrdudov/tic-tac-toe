@@ -3,8 +3,25 @@ version: '3.8'
 services:
   web:
     build: .
-    command: uvicorn app.main:app --host 0.0.0.0
+    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; uvicorn app.main:app --host 0.0.0.0'
     volumes:
       - .:/app
     ports:
       - 8008:8000
+    environment:
+      - DATABASE_URL=postgresql://fastapi_tic_tac_toe:fastapi_tic_tac_toe@db:5432/fastapi_tic_tac_toe
+    depends_on:
+      - db
+  db:
+    image: postgres:15-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    expose:
+      - 5432
+    environment:
+      - POSTGRES_USER=fastapi_tic_tac_toe
+      - POSTGRES_PASSWORD=fastapi_tic_tac_toe
+      - POSTGRES_DB=fastapi_tic_tac_toe
+
+volumes:
+  postgres_data:

@@ -1,0 +1,30 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.tic-tac-toe__container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    max-width: 600px;
+    max-height: 600px;
+    background-color: bisque;
+}
+
+.cell {
+    height: 200px;
+    width: 200px;    
+    border: 2px solid black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 100px;
+}
+
+/* .cell:nth-child(3n + 1) {
+    border-left: none;
+} */

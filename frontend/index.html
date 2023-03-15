@@ -4,11 +4,20 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Smokum&family=Titan+One&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="reset.css">
     <link rel="stylesheet" href="style.css">
     <title>Tic-Tac-Toe</title>
 </head>
 <body>
+    <div class="title">
+        <h1>TIC-TAC-TOE</h1>
+    </div>
+    <div class="message__section">
+        <p id="message"></p>
+    </div>
     <section class="tic-tac-toe__container">
         <div class="cell"></div>
         <div class="cell"></div>
@@ -19,7 +28,10 @@
         <div class="cell"></div>
         <div class="cell"></div>
         <div class="cell"></div>
+        
+        <div id="cross_line"></div>
     </section>
+    <button class="restart_btn" type="reset">RESTART</button>
     <script src="script.js"></script>
 </body>
 </html>

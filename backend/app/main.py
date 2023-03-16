@@ -2,29 +2,24 @@ from fastapi import Depends, FastAPI
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db import get_session, init_db
-from app.models import Song, SongCreate
+from app.db import get_session
+from app.models import User, UserCreate
 
 app = FastAPI()
 
 
-@app.get("/ping")
-async def pong():
-    return {"ping": "pong!"}
+@app.get("/users", response_model=list[User])
+async def get_users(session: AsyncSession = Depends(get_session)):
+    result = await session.execute(select(User))
+    users = result.scalars().all()
+    return [User(name=user.name, id=user.id) for user in users]
 
 
-@app.get("/songs", response_model=list[Song])
-async def get_songs(session: AsyncSession = Depends(get_session)):
-    result = await session.execute(select(Song))
-    songs = result.scalars().all()
-    return [Song(name=song.name, artist=song.artist, year=song.year, id=song.id) for song in songs]
-
-
-@app.post("/songs")
-async def add_song(song: SongCreate, session: AsyncSession = Depends(get_session)):
-    song = Song(name=song.name, artist=song.artist, year=song.year)
-    session.add(song)
+@app.post("/users")
+async def add_user(user: UserCreate, session: AsyncSession = Depends(get_session)):
+    user = User(name=user.name)
+    session.add(user)
     await session.commit()
-    await session.refresh(song)
-    return song
+    await session.refresh(user)
+    return user
 

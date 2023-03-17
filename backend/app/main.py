@@ -1,6 +1,7 @@
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.exc import IntegrityError
 
 from app.db import get_session
 from app.models import User, UserCreate
@@ -19,7 +20,10 @@ async def get_users(session: AsyncSession = Depends(get_session)):
 async def add_user(user: UserCreate, session: AsyncSession = Depends(get_session)):
     user = User(name=user.name)
     session.add(user)
-    await session.commit()
+    try:
+        await session.commit()
+    except IntegrityError:
+        raise HTTPException(status_code=422) 
     await session.refresh(user)
     return user
 

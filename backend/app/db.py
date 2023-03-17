@@ -1,27 +1,17 @@
+import os
 
-import databases
-import ormar
-import sqlalchemy
-
-from .config import settings
-
-database = databases.Database(settings.db_url)
-metadata = sqlalchemy.MetaData()
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.orm import sessionmaker
 
 
-class BaseMeta(ormar.ModelMeta):
-    metadata = metadata
-    database = database
+DATABASE_URL = os.environ.get("DATABASE_URL")
+
+engine = create_async_engine(DATABASE_URL, echo=True, future=True)
 
 
-class User(ormar.Model):
-    class Meta(BaseMeta):
-        tablename = "users"
-
-    id: int = ormar.Integer(primary_key=True)
-    email: str = ormar.String(max_length=128, unique=True, nullable=False)
-    active: bool = ormar.Boolean(default=True, nullable=False)
-
-
-engine = sqlalchemy.create_engine(settings.db_url)
-metadata.create_all(engine)
+async def get_session() -> AsyncSession:
+    async_session = sessionmaker(
+        engine, class_=AsyncSession, expire_on_commit=False
+    )
+    async with async_session() as session:
+        yield session

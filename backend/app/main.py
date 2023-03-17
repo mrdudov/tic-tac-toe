@@ -1,25 +1,29 @@
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI, HTTPException
+from sqlalchemy.future import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.exc import IntegrityError
 
-from app.db import database, User
+from app.db import get_session
+from app.models import User, UserCreate
 
-
-app = FastAPI(title="FastAPI, Docker")
-
-
-@app.get("/")
-async def read_root():
-    return await User.objects.all()
+app = FastAPI()
 
 
-@app.on_event("startup")
-async def startup():
-    if not database.is_connected:
-        await database.connect()
-    # create a dummy entry
-    await User.objects.get_or_create(email="test@test.com")
+@app.get("/users", response_model=list[User])
+async def get_users(session: AsyncSession = Depends(get_session)):
+    result = await session.execute(select(User))
+    users = result.scalars().all()
+    return [User(name=user.name, id=user.id) for user in users]
 
 
-@app.on_event("shutdown")
-async def shutdown():
-    if database.is_connected:
-        await database.disconnect()
+@app.post("/users")
+async def add_user(user: UserCreate, session: AsyncSession = Depends(get_session)):
+    user = User(name=user.name)
+    session.add(user)
+    try:
+        await session.commit()
+    except IntegrityError:
+        raise HTTPException(status_code=422) 
+    await session.refresh(user)
+    return user
+

@@ -2,7 +2,6 @@ const cells = document.querySelectorAll('.cell');
 
 const message = document.querySelector('#message');
 
-
 function getRandomInt(max) {
     return Math.floor(Math.random() * max) 
 }
@@ -76,8 +75,17 @@ function check_winner (cells) {
     return result;
 }
 
-function after_win () {
+function after_win() {
     cells.forEach(cell => {
-        cell.classList.add('disable_cell')
+        cell.classList.add('disable_cell');
     })
+}
+
+function clear_game_board() {
+    message.innerHTML = '';
+    cells.forEach(cell => {
+        cell.innerHTML = '';
+        cell.classList.remove('disable_cell');
+    })
+
 }

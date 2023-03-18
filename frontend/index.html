@@ -15,9 +15,6 @@
     <div class="title">
         <h1>TIC-TAC-TOE</h1>
     </div>
-    <div class="message__section">
-        <p id="message"></p>
-    </div>
     <section class="tic-tac-toe__container">
         <div class="cell"></div>
         <div class="cell"></div>
@@ -29,7 +26,10 @@
         <div class="cell"></div>
         <div class="cell"></div>
         
-        <div id="cross_line"></div>
+        <div id="window_after_game_over">
+            <p id="winner"></p>
+            <p id="description"></p>
+        </div>
     </section>
     <button class="restart_btn" onclick="clear_game_board()" type="reset">RESTART</button>
     <script src="script.js"></script>

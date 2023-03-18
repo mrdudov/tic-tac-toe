@@ -1,6 +1,7 @@
 const cells = document.querySelectorAll('.cell');
 
-const message = document.querySelector('#message');
+const winner = document.querySelector('#winner');
+const description = document.querySelector('#description');
 
 function getRandomInt(max) {
     return Math.floor(Math.random() * max) 
@@ -15,15 +16,17 @@ function remove_on_click_cell(cells) {
 
 function on_cell_click (data) {
     if (data.target.innerHTML !== '') {
-        message.innerHTML = 'Занято'
+        alert("ЗАНЯТО БРАЗЕ")
         return
     }
     data.target.innerHTML = 'X'
-    const is_winner1 = check_winner(cells)
-     if (is_winner1 !== false) {
-        message.innerHTML = '!!!We got a winner!!! ' + is_winner1
+    const is_winnerX = check_winner(cells)
+     if (is_winnerX !== false) {
+        winner.innerHTML = is_winnerX;
+        description.innerHTML = 'WON THIS GAME'
         remove_on_click_cell(cells);
         after_win();
+        return
 
     }
 
@@ -34,16 +37,19 @@ function on_cell_click (data) {
     const freecells_length = freecell.length;
     
     if (freecells_length === 0) {
-        message.innerHTML = 'GAME OVER'
+        winner.innerHTML = 'GAME';
+        description.innerHTML = 'OVER';
     }
 
     const randNum = getRandomInt(freecells_length);
      freecell[randNum].textContent = 'O';
-     const is_winner = check_winner(cells)
-     if (is_winner !== false) {
-        message.innerHTML = '!!!We got a winner!!! ' + is_winner
+     const is_winnerO = check_winner(cells)
+     if (is_winnerO !== false) {
+        winner.innerHTML = is_winnerO;
+        description.innerHTML = 'WON THIS GAME'
         remove_on_click_cell(cells);
         after_win();
+        return
     }
 }
 
@@ -66,26 +72,35 @@ function check_winner (cells) {
     let result = false;
     winningCombos.forEach((combo) => {
         if (cells[combo[0]].innerHTML == 'X' && cells[combo[1]].innerHTML == 'X' && cells[combo[2]].innerHTML == 'X') {
+            cells[combo[0]].style.color = 'red';
+            cells[combo[1]].style.color = 'red';
+            cells[combo[2]].style.color = 'red';
             result = 'X'
         }
         if (cells[combo[0]].innerHTML == 'O' && cells[combo[1]].innerHTML == 'O' && cells[combo[2]].innerHTML == 'O') {
+            cells[combo[0]].style.color = 'red';
+            cells[combo[1]].style.color = 'red';
+            cells[combo[2]].style.color = 'red';
             result =  'O'
         }
-    })  
+    })
+
     return result;
 }
 
 function after_win() {
-    cells.forEach(cell => {
-        cell.classList.add('disable_cell');
-    })
+    window_after_game_over.style.opacity = '1';
+    window_after_game_over.style['z-index'] = '99';
 }
 
 function clear_game_board() {
-    message.innerHTML = '';
+    window_after_game_over.style.opacity = '0';
+    window_after_game_over.style['z-index'] = '-1';
     cells.forEach(cell => {
         cell.innerHTML = '';
+        cell.style.color = '';
         cell.classList.remove('disable_cell');
+        cell.addEventListener('click', on_cell_click);
     })
 
 }

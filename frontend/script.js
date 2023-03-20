@@ -9,8 +9,8 @@ function getRandomInt(max) {
 
 function remove_on_click_cell(cells) {
     cells.forEach(cell => {
-        console.log(cell)
-        cell.removeEventListener('click', on_cell_click )
+        console.log(cell);
+        cell.removeEventListener('click', on_cell_click );
     })
 }
 
@@ -20,10 +20,10 @@ function on_cell_click (data) {
         return
     }
     data.target.innerHTML = 'X'
-    const is_winnerX = check_winner(cells)
+    const is_winnerX = check_winner(cells);
      if (is_winnerX !== false) {
         winner.innerHTML = is_winnerX;
-        description.innerHTML = 'WON THIS GAME'
+        description.innerHTML = 'WON THIS GAME';
         remove_on_click_cell(cells);
         after_win();
         return
@@ -37,16 +37,18 @@ function on_cell_click (data) {
     const freecells_length = freecell.length;
     
     if (freecells_length === 0) {
+        after_win();
         winner.innerHTML = 'GAME';
         description.innerHTML = 'OVER';
+        return
     }
 
     const randNum = getRandomInt(freecells_length);
      freecell[randNum].textContent = 'O';
-     const is_winnerO = check_winner(cells)
+     const is_winnerO = check_winner(cells);
      if (is_winnerO !== false) {
         winner.innerHTML = is_winnerO;
-        description.innerHTML = 'WON THIS GAME'
+        description.innerHTML = 'WON THIS GAME';
         remove_on_click_cell(cells);
         after_win();
         return

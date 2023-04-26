@@ -6,7 +6,7 @@ from sqlalchemy.exc import IntegrityError
 from app.db import get_session
 from app.models import User, UserCreate
 
-app = FastAPI()
+app = FastAPI(root_path="/api/v1")
 
 
 @app.get("/users", response_model=list[User])
@@ -26,4 +26,3 @@ async def add_user(user: UserCreate, session: AsyncSession = Depends(get_session
         raise HTTPException(status_code=422) 
     await session.refresh(user)
     return user
-

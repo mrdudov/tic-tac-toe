@@ -11,36 +11,42 @@
     <link rel="stylesheet" href="styles/style.css">
     <title>Tic-Tac-Toe</title>
 </head>
-<body>
-    <!-- need refactor -->
-    <label for="name">Введите има:</label>
-    <input type="text"  id="name">
-    <button id="name-btn">name</button>
-    
-    <button id="get-data">GET DATA</button>
-    <!-- need refactor -->
-    
-    <div class="title">
-        <h1>TIC-TAC-TOE</h1>
-    </div>
-    <section class="tic-tac-toe__container">
-        <div class="cell"></div>
-        <div class="cell"></div>
-        <div class="cell"></div>
-        <div class="cell"></div>
-        <div class="cell"></div>
-        <div class="cell"></div>
-        <div class="cell"></div>
-        <div class="cell"></div>
-        <div class="cell"></div>
+    <body>
         
-        <div id="window_after_game_over">
-            <p id="winner"></p>
-            <p id="description"></p>
+    <header class="header">
+        <div class="title">
+            <h1>TIC-TAC-TOE</h1>
         </div>
-    </section>
-    <button class="restart_btn" onclick="clear_game_board()" type="reset">RESTART</button>
-    <script src="script.js"></script>
-    <script src="./fetch.js"></script>
-</body>
+    </header>
+
+        <main class="main">
+            <div class="players__container">
+                <h3 class="my-name player-name"></h3>
+            </div>
+
+            <section class="tic-tac-toe__container">
+                <div class="cell"></div>
+                <div class="cell"></div>
+                <div class="cell"></div>
+                <div class="cell"></div>
+                <div class="cell"></div>
+                <div class="cell"></div>
+                <div class="cell"></div>
+                <div class="cell"></div>
+                <div class="cell"></div>
+        
+                <div id="window_after_game_over">
+                    <p id="winner"></p>
+                    <p id="description"></p>
+                </div>
+            </section>
+
+            <div class="players__container">
+                <h3 class="opponent-name player-name"></h3>
+            </div>
+        </main>
+        
+        <button class="restart_btn" onclick="clear_game_board()" type="reset">RESTART</button>
+        <script src="./js/game_logic.js"></script>
+    </body>
 </html>

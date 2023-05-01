@@ -10,6 +10,33 @@ body {
     font-family: 'Smokum', cursive;
 }
 
+.main {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 1400px;
+}
+
+.players__container {
+    max-width: 250px;
+    max-height: 100px;
+    padding: 20px;
+    border-radius: 15px;
+    background-color: rgba(41, 40, 40, 0.301);
+    backdrop-filter: blur(20px);
+    font-size: 40px;
+    margin-top: -400px;
+    letter-spacing: 2px;
+}
+
+.my-name {
+    color: #007006c4;
+}
+
+.opponent-name {
+    color:rgba(121, 0, 0, 0.842)
+}
+
 .title {
     position: relative;
     margin-left: 70px;
@@ -58,7 +85,6 @@ body {
 .cell:nth-child(9) {
     border-bottom: none;
 }
-
 
 .restart_btn {
     margin-top: 40px;

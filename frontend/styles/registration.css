@@ -31,7 +31,7 @@
     box-shadow: 0px -10px 250px 25px rgba(0,0,0,0.51) inset;
 }
 
-.registation__form {
+.registration__form {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -40,20 +40,19 @@
     top: 350px;
 }
 
-.registation__input {
+.registration__input {
     height: 100px;
     width: 600px;
-    margin-top: 10px;
-    margin-bottom: 20px;
+    margin-top: 30px;
     border: 5px solid black;
-    border-radius: 50px;
+    border-radius: 20px;
 
     background: url(../images/crossed-pistol-guns-pair-vintage-etched-engraved-style-84584540.jpg) no-repeat;
     background-position-y: -45px;
     background-size: 100%;
     box-shadow: 1px 1px 80px 1px rgba(0,0,0,0.75) inset;
 
-    font-family: 'Insane Rodeo';
+    font-family: 'Smokum';
     text-align: center;
     font-size: 60px;
     letter-spacing: 3px;
@@ -62,20 +61,20 @@
     cursor: pointer;
 }
 
-.registation__input::placeholder {
+.registration__input::placeholder {
     color: orangered;
     text-shadow:0px 1px 0 rgb(255,255,255),0px -1px 0 rgb(255,255,255),1px 0px 0 rgb(255,255,255),-1px 0px 0 rgb(255,255,255),1px 1px 0 rgb(255,255,255),1px -1px 0 rgb(255,255,255),-1px 1px 0 rgb(255,255,255),-1px -1px 0 rgb(255,255,255),0px 2px 0 rgb(255,255,255),0px -2px 0 rgb(255,255,255),2px 0px 0 rgb(255,255,255),-2px 0px 0 rgb(255,255,255),2px 2px 0 rgb(255,255,255),2px -2px 0 rgb(255,255,255),-2px 2px 0 rgb(255,255,255),-2px -2px 0 rgb(255,255,255);
     font-size: 50px;
 }
 
-.registation__input:focus::placeholder {
+.registration__input:focus::placeholder {
     color: transparent;
     text-shadow: none;
 }
 
 .registation__input:focus {
     cursor: text;
-    border: none;
+    outline: 5px double bisque;
 }
 
 .registration__btn {
@@ -84,6 +83,7 @@
     font-family: 'Woodcut';
     font-size: 40px;
     text-transform: uppercase;
+    text-align: center;
 
     border-radius: 20px;
     border: none;
@@ -104,10 +104,19 @@
 .registration__btn:active {
     background: rgb(120,63,25) linear-gradient(rgb(120,63,25) 20%, rgb(167,91,41));
     transform: translate(0, 4px);
-    box-shadow:
-    0 2px rgb(86,38,6),
-    0 1px 6px rgba(0,0,0,.4),
-    inset 0 1px rgba(255,255,255,.3),
-    inset 0 0 3px rgba(255,255,255,.5);
-    -webkit-transform: translate(0, 4px);
+    box-shadow: 0 2px rgb(86,38,6),
+                0 1px 6px rgba(0,0,0,.4),
+                inset 0 1px rgba(255,255,255,.3),
+                inset 0 0 3px rgba(255,255,255,.5);
+}
+
+.registration__invalid-name {
+    font-size: 25px;
+    letter-spacing: 4px;
+    color: #ffacac;
+    /* text-shadow:0px 1px 0 rgb(0, 0, 0),0px -1px 0 rgb(0, 0, 0),1px 0px 0 rgb(0, 0, 0),-1px 0px 0 rgb(0, 0, 0),1px 1px 0 rgb(0, 0, 0),1px -1px 0 rgb(0, 0, 0),-1px 1px 0 rgb(0, 0, 0),-1px -1px 0 rgb(0, 0, 0),0px 2px 0 rgb(0, 0, 0),0px -2px 0 rgb(0, 0, 0),2px 0px 0 rgb(0, 0, 0),-2px 0px 0 rgb(0, 0, 0),2px 2px 0 rgb(0, 0, 0),2px -2px 0 rgb(0, 0, 0),-2px 2px 0 rgb(0, 0, 0),-2px -2px 0 rgb(0, 0, 0); */
+    padding: 0 10px;
+    border-radius: 20px;
+    margin: 2px 0;
+    background-color: rgba(124, 14, 0, 0.664);
 }

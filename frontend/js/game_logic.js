@@ -1,5 +1,4 @@
 const cells = document.querySelectorAll('.cell');
-
 const winner = document.querySelector('#winner');
 const description = document.querySelector('#description');
 
@@ -106,3 +105,9 @@ function clear_game_board() {
     })
 
 }
+
+const myName = document.querySelector('.my-name');
+const opponentsName = document.querySelector('.opponent-name');
+
+myName.textContent = localStorage.getItem('myName')
+opponentsName.textContent = localStorage.getItem('opponentsName')

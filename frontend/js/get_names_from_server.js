@@ -6,7 +6,7 @@ async function getPlayersNames() {
   for (let key in result) {
     let playerName = result[key]['name'];
     
-    playersList.innerHTML += `<a href="./index.html" class="player">${playerName}</a>`;
+    playersList.innerHTML += `<a href="./gameboard.html" class="player">${playerName}</a>`;
     
   }
 

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Smokum&family=Titan+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/reset.css">
+    <link rel="stylesheet" href="styles/style.css">
+    <title>Tic-Tac-Toe</title>
+</head>
+    <body>
+        
+    <header class="header">
+        <div class="title">
+            <h1>TIC-TAC-TOE</h1>
+        </div>
+    </header>
+
+        <main class="main">
+            <div class="players__container">
+                <h3 class="my-name player-name"></h3>
+            </div>
+
+            <section class="tic-tac-toe__container">
+                <div class="cell"></div>
+                <div class="cell"></div>
+                <div class="cell"></div>
+                <div class="cell"></div>
+                <div class="cell"></div>
+                <div class="cell"></div>
+                <div class="cell"></div>
+                <div class="cell"></div>
+                <div class="cell"></div>
+        
+                <div id="window_after_game_over">
+                    <p id="winner"></p>
+                    <p id="description"></p>
+                </div>
+            </section>
+
+            <div class="players__container">
+                <h3 class="opponent-name player-name"></h3>
+            </div>
+        </main>
+        
+        <button class="restart_btn" onclick="clear_game_board()" type="reset">RESTART</button>
+        <script src="./js/game_logic.js"></script>
+    </body>
+</html>

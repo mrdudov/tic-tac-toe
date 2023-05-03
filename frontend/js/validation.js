@@ -30,7 +30,7 @@ const name = nameInput.value.trim();
 if (validateNickname(name)) {
   localStorage.setItem('myName', name)
   window.location.href = './players_list.html'
-  // return addPlayerNameToServer()
+  return addPlayerNameToServer()
 }
 });
 

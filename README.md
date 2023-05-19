@@ -1,6 +1,7 @@
 # tic-tac-toe game
 
-## backend 
+## backend
+
 docker compose
 fastAPI
 postgresql

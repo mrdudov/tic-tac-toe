@@ -1,8 +1,10 @@
 from sqlmodel import SQLModel, Field
+from pydantic import EmailStr
 
 
 class UserBase(SQLModel):
     name: str = Field(unique=True)
+    email: EmailStr = Field(unique=True)
 
 
 class User(UserBase, table=True):
@@ -10,4 +12,4 @@ class User(UserBase, table=True):
 
 
 class UserCreate(UserBase):
-    pass
+    password: str = Field()

@@ -1,5 +1,10 @@
 {
     "cSpell.words": [
-        "fastapi"
+        "fastapi",
+        "pydantic",
+        "sessionmaker",
+        "sqlalchemy",
+        "sqlmodel",
+        "sqltypes"
     ]
 }

@@ -13,3 +13,5 @@ class User(UserBase, table=True):
 
 class UserCreate(UserBase):
     password: str = Field()
+
+# class UserLogin

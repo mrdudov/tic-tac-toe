@@ -8,7 +8,7 @@ from fastapi_jwt_auth.exceptions import AuthJWTException
 from pydantic import BaseModel
 
 from app.db import get_session
-from app.models import User, UserCreate
+from app.models import User, UserCreate, UserLogin
 from app.auth.auth_handler import generate_JWT
 from app.auth.auth_bearer import JWTBearer
 
@@ -19,10 +19,11 @@ app = FastAPI()
 class Settings(BaseModel):
     authjwt_secret_key: str = "secret"
 
-# callback to get your configuration
+
 @AuthJWT.load_config
 def get_config():
     return Settings()
+
 
 @app.exception_handler(AuthJWTException)
 def authjwt_exception_handler(request: Request, exc: AuthJWTException):
@@ -31,7 +32,7 @@ def authjwt_exception_handler(request: Request, exc: AuthJWTException):
 
 @app.get(
     "/users",
-    dependencies=[Depends(JWTBearer())],
+    # dependencies=[Depends(JWTBearer())],
     response_model=list[User],
     tags=["user"],
 )
@@ -60,14 +61,18 @@ async def get_jwt_token(user: UserCreate = Body(...)):
 
 @app.post("/login")
 async def login(
-    user: User,
+    user: UserLogin,
     session: AsyncSession = Depends(get_session),
     Authorize: AuthJWT = Depends(),
 ):
-    result = await session.execute(select(User).where(User.email == user.email))
-    if not list(result):
-        raise HTTPException(status_code=401,detail="Bad username or password")
-    
+    result = await session.execute(select(UserCreate).where(UserCreate.email == user.email))
+    temp = []
+    for r in result:
+        temp.append(r)
+    if not temp:
+        raise HTTPException(status_code=401, detail="Bad email or password")
+    # temp[0].
+
     access_token = Authorize.create_access_token(subject=user.email)
     refresh_token = Authorize.create_refresh_token(subject=user.email)
     return {"access_token": access_token, "refresh_token": refresh_token}
@@ -80,3 +85,11 @@ def refresh(Authorize: AuthJWT = Depends()):
     current_user = Authorize.get_jwt_subject()
     new_access_token = Authorize.create_access_token(subject=current_user)
     return {"access_token": new_access_token}
+
+
+@app.get("/protected")
+def protected(Authorize: AuthJWT = Depends()):
+    Authorize.jwt_required()
+
+    current_user = Authorize.get_jwt_subject()
+    return {"user": current_user}

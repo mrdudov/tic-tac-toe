@@ -1,7 +1,10 @@
 {
     "cSpell.words": [
         "authjwt",
+        "checkpw",
         "fastapi",
+        "gensalt",
+        "hashpw",
         "pydantic",
         "sessionmaker",
         "sqlalchemy",

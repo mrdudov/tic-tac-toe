@@ -11,7 +11,7 @@ from pydantic import BaseModel
 
 from app.db import get_session
 from app.models import User, UserCreate, ReturnUser
-from app.auth.auth_handler import generate_JWT
+from app.auth.hash_password import hash_password, check_password
 from app.auth.auth_fastapi_jwt_auth_bearer import (
     FastapiJwtAuthBearer,
     FastapiJwtAuthRefreshBearer,
@@ -49,20 +49,27 @@ async def get_users(
     return [ReturnUser(id=user.id, email=user.email) for user in users]
 
 
-@app.post("/users", tags=["user"])
-async def add_user(
-    user: UserCreate, session: AsyncSession = Depends(get_session)
+@app.post("/register", tags=["auth"])
+async def register_user(
+    user: UserCreate,
+    session: AsyncSession = Depends(get_session),
+    Authorize: AuthJWT = Depends(),
 ) -> ReturnUser:
-    user = User(email=user.email, password=user.password)
+    hashed_password = hash_password(user.password)
+    user = User(email=user.email, password=hashed_password)
     session.add(user)
     try:
         await session.commit()
-    except IntegrityError:
+    except IntegrityError as exc:
+        print(exc)
         raise HTTPException(status_code=422)
     await session.refresh(user)
+    access_token = Authorize.create_access_token(subject=user.email)
+    refresh_token = Authorize.create_refresh_token(subject=user.email)
     return {
         "user": ReturnUser(id=user.id, email=user.email),
-        "jwt": generate_JWT(user.email),
+        "access_token": access_token,
+        "refresh_token": refresh_token,
     }
 
 
@@ -72,13 +79,11 @@ async def login(
     session: AsyncSession = Depends(get_session),
     Authorize: AuthJWT = Depends(),
 ):
-    query = await session.execute(
-        select(User).where(User.email == user.email, User.password == user.password)
-    )
+    query = await session.execute(select(User).where(User.email == user.email))
 
     users = query.scalars().all()
 
-    u = [User(id=user.id, email=user.email) for user in users]
+    u = [User(id=user.id, email=user.email, password=user.password) for user in users]
 
     if len(u) > 1:
         raise HTTPException(
@@ -88,13 +93,20 @@ async def login(
     if not u:
         raise HTTPException(status_code=401, detail="Bad email or password")
 
+    if not check_password(
+        password=user.password, hashed_password=u[0].password.encode("utf-8")
+    ):
+        raise HTTPException(status_code=401, detail="Bad password")
+
     access_token = Authorize.create_access_token(subject=user.email)
     refresh_token = Authorize.create_refresh_token(subject=user.email)
     return {"user": u[0], "access_token": access_token, "refresh_token": refresh_token}
 
 
-@app.post("/refresh", dependencies=[Depends(FastapiJwtAuthRefreshBearer())], tags=["auth"])
-def refresh(Authorize: AuthJWT = Depends()):
+@app.post(
+    "/refresh", dependencies=[Depends(FastapiJwtAuthRefreshBearer())], tags=["auth"]
+)
+def refresh_access_token(Authorize: AuthJWT = Depends()):
     current_user = Authorize.get_jwt_subject()
     new_access_token = Authorize.create_access_token(subject=current_user)
     return {"access_token": new_access_token}

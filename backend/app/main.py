@@ -12,7 +12,10 @@ from pydantic import BaseModel
 from app.db import get_session
 from app.models import User, UserCreate, ReturnUser
 from app.auth.auth_handler import generate_JWT
-from app.auth.auth_fastapi_jwt_auth_bearer import FastapiJwtAuthBearer
+from app.auth.auth_fastapi_jwt_auth_bearer import (
+    FastapiJwtAuthBearer,
+    FastapiJwtAuthRefreshBearer,
+)
 
 
 app = FastAPI()
@@ -90,10 +93,8 @@ async def login(
     return {"user": u[0], "access_token": access_token, "refresh_token": refresh_token}
 
 
-@app.post("/refresh", tags=["auth"])
+@app.post("/refresh", dependencies=[Depends(FastapiJwtAuthRefreshBearer())], tags=["auth"])
 def refresh(Authorize: AuthJWT = Depends()):
-    Authorize.jwt_refresh_token_required()
-
     current_user = Authorize.get_jwt_subject()
     new_access_token = Authorize.create_access_token(subject=current_user)
     return {"access_token": new_access_token}

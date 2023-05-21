@@ -17,3 +17,19 @@ class FastapiJwtAuthBearer(HTTPBearer):
             return credentials.credentials
         else:
             raise HTTPException(status_code=403, detail="Invalid authorization code.")
+
+
+class FastapiJwtAuthRefreshBearer(HTTPBearer):
+    def __init__(self, auto_error: bool = True):
+        super(FastapiJwtAuthRefreshBearer, self).__init__(auto_error=auto_error)
+
+    async def __call__(self, request: Request):
+        credentials: HTTPAuthorizationCredentials = await super(
+            FastapiJwtAuthRefreshBearer, self
+        ).__call__(request)
+        if credentials:
+            auth = AuthJWT(req=request)
+            auth.jwt_refresh_token_required()
+            return credentials.credentials
+        else:
+            raise HTTPException(status_code=403, detail="Invalid authorization code.")

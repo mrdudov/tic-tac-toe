@@ -13,12 +13,10 @@ def token_response(token: str):
     return {"access_token": token}
 
 
-
-
 def generate_JWT(user_id: str) -> Dict[str, str]:
     payload = {"user_id": user_id, "expires": time.time() + JWT_EXPIRES}
     token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
-    
+
     return token_response(token)
 
 

@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import Depends, FastAPI, HTTPException, Body, Depends, Request
+from fastapi import Depends, FastAPI, HTTPException, Depends, Request
 from fastapi.responses import JSONResponse
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -12,7 +12,7 @@ from pydantic import BaseModel
 from app.db import get_session
 from app.models import User, UserCreate, ReturnUser
 from app.auth.auth_handler import generate_JWT
-from app.auth.auth_bearer import JWTBearer
+from app.auth.auth_fastapi_jwt_auth_bearer import FastapiJwtAuthBearer
 
 
 app = FastAPI()
@@ -34,11 +34,13 @@ def authjwt_exception_handler(request: Request, exc: AuthJWTException):
 
 @app.get(
     "/users",
-    # dependencies=[Depends(JWTBearer())],
+    dependencies=[Depends(FastapiJwtAuthBearer())],
     response_model=list[ReturnUser],
     tags=["user"],
 )
-async def get_users(session: AsyncSession = Depends(get_session)) -> List[ReturnUser]:
+async def get_users(
+    session: AsyncSession = Depends(get_session),
+) -> List[ReturnUser]:
     result = await session.execute(select(User))
     users = result.scalars().all()
     return [ReturnUser(id=user.id, email=user.email) for user in users]
@@ -95,11 +97,3 @@ def refresh(Authorize: AuthJWT = Depends()):
     current_user = Authorize.get_jwt_subject()
     new_access_token = Authorize.create_access_token(subject=current_user)
     return {"access_token": new_access_token}
-
-
-@app.get("/protected", tags=["probe"])
-def protected(Authorize: AuthJWT = Depends()):
-    Authorize.jwt_required()
-
-    current_user = Authorize.get_jwt_subject()
-    return {"user": current_user}

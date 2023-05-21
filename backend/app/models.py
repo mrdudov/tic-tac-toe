@@ -1,19 +1,17 @@
 from sqlmodel import SQLModel, Field
-from pydantic import EmailStr
+from pydantic import EmailStr, BaseModel
 
 
-class UserBase(SQLModel):
-    email: EmailStr = Field(unique=True)
-
-
-class User(UserBase, table=True):
-    name: str = Field(unique=True)
+class User(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
-
-
-class UserCreate(UserBase):
+    email: EmailStr = Field(unique=True)
     password: str = Field()
 
 
-class UserLogin(UserBase):
-    name: str = Field(unique=True)
+class UserCreate(BaseModel):
+    email: EmailStr
+    password: str
+
+class ReturnUser(BaseModel):
+    id: int
+    email: EmailStr

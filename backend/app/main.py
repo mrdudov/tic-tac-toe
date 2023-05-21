@@ -1,3 +1,5 @@
+from typing import List
+
 from fastapi import Depends, FastAPI, HTTPException, Body, Depends, Request
 from fastapi.responses import JSONResponse
 from sqlalchemy.future import select
@@ -8,7 +10,7 @@ from fastapi_jwt_auth.exceptions import AuthJWTException
 from pydantic import BaseModel
 
 from app.db import get_session
-from app.models import User, UserCreate, UserLogin
+from app.models import User, UserCreate, ReturnUser
 from app.auth.auth_handler import generate_JWT
 from app.auth.auth_bearer import JWTBearer
 
@@ -33,52 +35,60 @@ def authjwt_exception_handler(request: Request, exc: AuthJWTException):
 @app.get(
     "/users",
     # dependencies=[Depends(JWTBearer())],
-    response_model=list[User],
+    response_model=list[ReturnUser],
     tags=["user"],
 )
-async def get_users(session: AsyncSession = Depends(get_session)):
+async def get_users(session: AsyncSession = Depends(get_session)) -> List[ReturnUser]:
     result = await session.execute(select(User))
     users = result.scalars().all()
-    return [User(name=user.name, id=user.id, email=user.email) for user in users]
+    return [ReturnUser(id=user.id, email=user.email) for user in users]
 
 
 @app.post("/users", tags=["user"])
-async def add_user(user: UserCreate, session: AsyncSession = Depends(get_session)):
-    user = User(name=user.name, email=user.email, password=user.password)
+async def add_user(
+    user: UserCreate, session: AsyncSession = Depends(get_session)
+) -> ReturnUser:
+    user = User(email=user.email, password=user.password)
     session.add(user)
     try:
         await session.commit()
     except IntegrityError:
         raise HTTPException(status_code=422)
     await session.refresh(user)
-    return {"user": user, "jwt": generate_JWT(user.email)}
+    return {
+        "user": ReturnUser(id=user.id, email=user.email),
+        "jwt": generate_JWT(user.email),
+    }
 
 
-@app.post("/users/get_jwt_token", tags=["user"])
-async def get_jwt_token(user: UserCreate = Body(...)):
-    return generate_JWT(user.email)
-
-
-@app.post("/login")
+@app.post("/login", tags=["auth"])
 async def login(
-    user: UserLogin,
+    user: UserCreate,
     session: AsyncSession = Depends(get_session),
     Authorize: AuthJWT = Depends(),
 ):
-    result = await session.execute(select(UserCreate).where(UserCreate.email == user.email))
-    temp = []
-    for r in result:
-        temp.append(r)
-    if not temp:
+    query = await session.execute(
+        select(User).where(User.email == user.email, User.password == user.password)
+    )
+
+    users = query.scalars().all()
+
+    u = [User(id=user.id, email=user.email) for user in users]
+
+    if len(u) > 1:
+        raise HTTPException(
+            status_code=500, detail="Server error. More then one user found"
+        )
+
+    if not u:
         raise HTTPException(status_code=401, detail="Bad email or password")
-    # temp[0].
 
     access_token = Authorize.create_access_token(subject=user.email)
     refresh_token = Authorize.create_refresh_token(subject=user.email)
-    return {"access_token": access_token, "refresh_token": refresh_token}
+    return {"user": u[0], "access_token": access_token, "refresh_token": refresh_token}
 
 
-@app.post("/refresh")
+@app.post("/refresh", tags=["auth"])
 def refresh(Authorize: AuthJWT = Depends()):
     Authorize.jwt_refresh_token_required()
 
@@ -87,7 +97,7 @@ def refresh(Authorize: AuthJWT = Depends()):
     return {"access_token": new_access_token}
 
 
-@app.get("/protected")
+@app.get("/protected", tags=["probe"])
 def protected(Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
 

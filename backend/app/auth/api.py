@@ -7,7 +7,8 @@ from pydantic import BaseModel
 from fastapi_jwt_auth import AuthJWT
 
 from app.db import get_session
-from app.models import User, UserCreate, ReturnUser
+from app.models import User, UserCreate
+from app.auth.schemas import UserLoginResponse, ReturnUser, AccessToken
 from app.auth.hash_password import hash_password, check_password
 from app.auth.auth_fastapi_jwt_auth_bearer import FastapiJwtAuthRefreshBearer
 
@@ -29,13 +30,14 @@ async def register_user(
     user: UserCreate,
     session: AsyncSession = Depends(get_session),
     Authorize: AuthJWT = Depends(),
-) -> ReturnUser:
+) -> UserLoginResponse:
     hashed_password = hash_password(user.password)
     user = User(email=user.email, password=hashed_password)
     session.add(user)
     try:
         await session.commit()
     except IntegrityError as exc:
+        # TODO: correct error messages
         print(exc)
         raise HTTPException(status_code=422)
     await session.refresh(user)
@@ -53,7 +55,7 @@ async def login(
     user: UserCreate,
     session: AsyncSession = Depends(get_session),
     Authorize: AuthJWT = Depends(),
-):
+) -> UserLoginResponse:
     query = await session.execute(select(User).where(User.email == user.email))
 
     users = query.scalars().all()
@@ -79,7 +81,7 @@ async def login(
 
 
 @router.post("/refresh", dependencies=[Depends(FastapiJwtAuthRefreshBearer())])
-def refresh_access_token(Authorize: AuthJWT = Depends()):
+def refresh_access_token(Authorize: AuthJWT = Depends()) -> AccessToken:
     current_user = Authorize.get_jwt_subject()
     new_access_token = Authorize.create_access_token(subject=current_user)
     return {"access_token": new_access_token}

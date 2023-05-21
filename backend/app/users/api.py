@@ -1,6 +1,6 @@
-from typing import List
+from typing import List, Annotated
 
-from fastapi import Depends, Depends, APIRouter
+from fastapi import Depends, Depends, APIRouter, File, UploadFile
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -23,3 +23,13 @@ async def get_users(
     result = await session.execute(select(User))
     users = result.scalars().all()
     return [ReturnUser(id=user.id, email=user.email) for user in users]
+
+
+@router.post("/files/")
+async def create_file(file: Annotated[bytes, File()]):
+    return {"file_size": len(file)}
+
+
+@router.post("/uploadfile/")
+async def create_upload_file(file: UploadFile):
+    return {"filename": file.filename}

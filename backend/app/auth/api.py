@@ -7,7 +7,8 @@ from pydantic import BaseModel
 from fastapi_jwt_auth import AuthJWT
 
 from app.db import get_session
-from app.models import User, UserCreate
+from app.users.models import User
+from app.users.schemas import UserCreate
 from app.auth.schemas import UserLoginResponse, ReturnUser, AccessToken
 from app.auth.hash_password import hash_password, check_password
 from app.auth.auth_fastapi_jwt_auth_bearer import FastapiJwtAuthRefreshBearer

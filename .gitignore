@@ -1,2 +1,10 @@
+./data_base
+!data_base/.gitkeep
+
+data_base/user_profile_img/*
+!data_base/user_profile_img/.gitkeep
+
+
+
 __pycache__
 env

@@ -1,3 +1,6 @@
+import '../styles/reset.css'
+import '../styles/players_list.css'
+
 async function getPlayersNames() {
   const playersList = document.querySelector('.players__list');  
   let response = await fetch('http://tic-tac-toe.mrdudov.ru/api/v1/users');

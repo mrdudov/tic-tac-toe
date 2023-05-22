@@ -1,6 +1,12 @@
+import '../styles/reset.css'
+import '../styles/gameboard.css'
+
+
+
 const cells = document.querySelectorAll('.cell');
 const winner = document.querySelector('#winner');
 const description = document.querySelector('#description');
+const restartBtn = document.querySelector('.restart_btn');
 
 function getRandomInt(max) {
     return Math.floor(Math.random() * max) 
@@ -94,7 +100,7 @@ function after_win() {
     window_after_game_over.style['z-index'] = '99';
 }
 
-function clear_game_board() {
+restartBtn.addEventListener('click', () => {
     window_after_game_over.style.opacity = '0';
     window_after_game_over.style['z-index'] = '-1';
     cells.forEach(cell => {
@@ -104,7 +110,7 @@ function clear_game_board() {
         cell.addEventListener('click', on_cell_click);
     })
 
-}
+}) 
 
 const myName = document.querySelector('.my-name');
 const opponentsName = document.querySelector('.opponent-name');

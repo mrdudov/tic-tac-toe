@@ -1,12 +1,12 @@
 @font-face {
     font-family: 'Woodcut';
-    src: url(../fonts/WOODCUT.TTF);
+    src: url(../assets/fonts/WOODCUT.TTF);
     font-display: swap;
 }
 
 @font-face {
     font-family: 'Insane Rodeo';
-    src: url(../fonts/IFC_INSANE_RODEO.ttf);
+    src: url(../assets/fonts/IFC_INSANE_RODEO.ttf);
     font-display: swap;
 }
 
@@ -16,7 +16,7 @@
     align-items: center;
     min-height: 100vh;
     min-width: 100vh;
-    background: url(../images/intro_bg.jpg) no-repeat;
+    background: url(../assets/images/intro_bg.jpg) no-repeat;
     background-size: cover;
     box-shadow: 1px 34px 148px 51px rgba(0,0,0,0.71) inset;
 }
@@ -25,7 +25,7 @@
     margin-bottom: 150px;
     width: 820px;
     height: 550px;
-    background: url(../images/registation_card_bg.jpg) no-repeat;
+    background: url(../assets/images/registation_card_bg.jpg) no-repeat;
     background-size: 100%;
     border-radius: 3px 3px 200px 200px;
     box-shadow: 0px -10px 250px 25px rgba(0,0,0,0.51) inset;
@@ -47,7 +47,7 @@
     border: 5px solid black;
     border-radius: 20px;
 
-    background: url(../images/crossed-pistol-guns-pair-vintage-etched-engraved-style-84584540.jpg) no-repeat;
+    background: url(../assets/images/crossed-pistol-guns-pair-vintage-etched-engraved-style-84584540.jpg) no-repeat;
     background-position-y: -45px;
     background-size: 100%;
     box-shadow: 1px 1px 80px 1px rgba(0,0,0,0.75) inset;

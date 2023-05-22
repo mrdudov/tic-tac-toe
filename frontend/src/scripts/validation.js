@@ -1,3 +1,6 @@
+import '../styles/reset.css'
+import '../styles/registration.css'
+
 function validateNickname(name) {
   const invalidNameMsg = document.querySelector('.registration__invalid-name');
   
@@ -34,10 +37,10 @@ if (validateNickname(name)) {
 }
 });
 
-
+// REQUSET URL ДЖОКЪДУ
 function addPlayerNameToServer() {
   const requestBody = { 'name': nameInput.value }; 
-  fetch(requestURL, {
+  fetch(requestURL, { 
     method: 'POST', 
     headers: {
       'Content-Type': 'application/json'

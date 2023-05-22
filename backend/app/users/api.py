@@ -1,6 +1,7 @@
 from typing import List
 
 from fastapi import Depends, Depends, APIRouter, UploadFile, HTTPException
+from fastapi.responses import FileResponse
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
@@ -72,8 +73,7 @@ async def create_upload_file(
     async with aiofiles.open(file_name, "wb+") as out_file:
         while content := await file.read(1024):
             await out_file.write(content)
-    img_url = f"/users/profile-img/{current_user}.{file.filename}"
-    current_user = Authorize.get_jwt_subject()
+    img_url = f"{current_user}.{file.filename}"
     query = await session.execute(select(User).where(User.email == current_user))
 
     query.scalar_one().profile_img = img_url
@@ -89,3 +89,10 @@ async def create_upload_file(
         raise HTTPException(status_code=422, detail=exc)
 
     return {"url": img_url}
+
+
+@router.get("/profile-img/", dependencies=[Depends(FastapiJwtAuthBearer())])
+async def get_profile_img(url: str, Authorize: AuthJWT = Depends()):
+    Authorize.get_jwt_subject()
+    file_path = f"/usr/src/data_base/user_profile_img/{url}"
+    return FileResponse(file_path)

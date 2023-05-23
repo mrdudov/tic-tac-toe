@@ -3,8 +3,6 @@ from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 from fastapi_jwt_auth import AuthJWT
-from pydantic import BaseModel
-from fastapi_jwt_auth import AuthJWT
 
 from app.db import get_session
 from app.users.models import User
@@ -15,15 +13,6 @@ from app.auth.auth_fastapi_jwt_auth_bearer import FastapiJwtAuthRefreshBearer
 
 
 router = APIRouter(prefix="/auth", tags=["auth"])
-
-
-class Settings(BaseModel):
-    authjwt_secret_key: str = "secret"
-
-
-@AuthJWT.load_config
-def get_config():
-    return Settings()
 
 
 @router.post("/register")

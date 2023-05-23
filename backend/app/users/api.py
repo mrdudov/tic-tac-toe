@@ -5,6 +5,7 @@ from fastapi.responses import FileResponse
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from fastapi_jwt_auth import AuthJWT
 import aiofiles
 
@@ -66,27 +67,30 @@ async def create_upload_file(
     session: AsyncSession = Depends(get_session),
     Authorize: AuthJWT = Depends(),
 ):
-    # TODO: fix file name and file path
     current_user = Authorize.get_jwt_subject()
+    query = await session.execute(select(User).where(User.email == current_user))
+
+    try:
+        user = query.scalar_one()
+    except NoResultFound as exc:
+        raise HTTPException(status_code=404, detail="auth error user not found")
+    except MultipleResultsFound as exc:
+        HTTPException(status_code=404, detail="auth error multiple users found")
+
+    # TODO: fix file name and file path
     file_name = f"/usr/src/data_base/user_profile_img/{current_user}.{file.filename}"
 
     async with aiofiles.open(file_name, "wb+") as out_file:
         while content := await file.read(1024):
             await out_file.write(content)
     img_url = f"{current_user}.{file.filename}"
-    query = await session.execute(select(User).where(User.email == current_user))
-
-    query.scalar_one().profile_img = img_url
 
     try:
+        user.profile_img = img_url
         await session.commit()
     except IntegrityError as exc:
         # TODO: correct error messages
-        print(exc)
         raise HTTPException(status_code=422)
-    except Exception as exc:
-        print(exc)
-        raise HTTPException(status_code=422, detail=exc)
 
     return {"url": img_url}
 

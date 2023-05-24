@@ -6,6 +6,11 @@ class Settings(BaseSettings):
     authjwt_access_token_expires: int
     max_online_users: int
 
+    POSTGRES_USER: str
+    POSTGRES_PASSWORD: str
+    POSTGRES_DB: str
+    POSTGRES_HOST: str
+
     class Config:
         env_file = ".env"
 

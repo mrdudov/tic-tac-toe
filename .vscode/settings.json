@@ -1,6 +1,7 @@
 {
     "cSpell.words": [
         "aiofiles",
+        "asyncpg",
         "authjwt",
         "checkpw",
         "fastapi",

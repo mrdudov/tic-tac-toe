@@ -7,10 +7,8 @@ from fastapi_jwt_auth import AuthJWT
 from app.auth.api import router as auth_router
 from app.users.api import router as users_router
 from app.websocket.websocket import router as ws_router
-from app.settings import Settings
+from app.settings import SETTINGS
 
-
-SETTINGS = Settings()
 
 app = FastAPI()
 
@@ -28,4 +26,3 @@ app.include_router(ws_router)
 @app.exception_handler(AuthJWTException)
 def authjwt_exception_handler(request: Request, exc: AuthJWTException):
     return JSONResponse(status_code=exc.status_code, content={"detail": exc.message})
-

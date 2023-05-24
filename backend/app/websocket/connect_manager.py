@@ -1,11 +1,14 @@
 from fastapi import WebSocket
-
+from app.settings import SETTINGS
+from app.websocket.exceptions import OnlineLimitException
 
 class ConnectionManager:
     def __init__(self):
         self.active_connections: list[WebSocket] = []
 
     async def connect(self, websocket: WebSocket):
+        if len(self.active_connections) >= SETTINGS.max_online_users:
+            raise OnlineLimitException
         await websocket.accept()
         self.active_connections.append(websocket)
 

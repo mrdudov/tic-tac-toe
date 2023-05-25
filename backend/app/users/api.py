@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import Depends, Depends, APIRouter, UploadFile, HTTPException
+from fastapi import Depends, APIRouter, UploadFile, HTTPException
 from fastapi.responses import FileResponse
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession

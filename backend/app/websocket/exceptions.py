@@ -1,0 +1,2 @@
+class OnlineLimitException(Exception):
+    pass

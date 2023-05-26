@@ -3,8 +3,6 @@ from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 from fastapi_jwt_auth import AuthJWT
-from pydantic import BaseModel
-from fastapi_jwt_auth import AuthJWT
 
 from app.db import get_session
 from app.users.models import User
@@ -12,18 +10,10 @@ from app.users.schemas import UserCreate
 from app.auth.schemas import UserLoginResponse, ReturnUser, AccessToken
 from app.auth.hash_password import hash_password, check_password
 from app.auth.auth_fastapi_jwt_auth_bearer import FastapiJwtAuthRefreshBearer
+from app.users.functions import get_user_by_email, get_user_claims
 
 
 router = APIRouter(prefix="/auth", tags=["auth"])
-
-
-class Settings(BaseModel):
-    authjwt_secret_key: str = "secret"
-
-
-@AuthJWT.load_config
-def get_config():
-    return Settings()
 
 
 @router.post("/register")
@@ -38,12 +28,14 @@ async def register_user(
     try:
         await session.commit()
     except IntegrityError as exc:
-        # TODO: correct error messages
-        print(exc)
-        raise HTTPException(status_code=422)
+        raise HTTPException(status_code=422, detail=f"{exc=}")
     await session.refresh(user)
-    access_token = Authorize.create_access_token(subject=user.email)
-    refresh_token = Authorize.create_refresh_token(subject=user.email)
+    access_token = Authorize.create_access_token(
+        subject=user.email, user_claims=get_user_claims(user.dict())
+    )
+    refresh_token = Authorize.create_refresh_token(
+        subject=user.email, user_claims=get_user_claims(user.dict())
+    )
     return {
         "user": ReturnUser(id=user.id, email=user.email),
         "access_token": access_token,
@@ -57,32 +49,38 @@ async def login(
     session: AsyncSession = Depends(get_session),
     Authorize: AuthJWT = Depends(),
 ) -> UserLoginResponse:
-    query = await session.execute(select(User).where(User.email == user.email))
-
-    users = query.scalars().all()
-
-    u = [User(id=user.id, email=user.email, password=user.password) for user in users]
-
-    if len(u) > 1:
-        raise HTTPException(
-            status_code=500, detail="Server error. More then one user found"
-        )
-
-    if not u:
-        raise HTTPException(status_code=401, detail="Bad email or password")
+    user_from_db = await get_user_by_email(session=session, email=user.email)
 
     if not check_password(
-        password=user.password, hashed_password=u[0].password.encode("utf-8")
+        password=user.password, hashed_password=user_from_db.password.encode("utf-8")
     ):
         raise HTTPException(status_code=401, detail="Bad password")
-
-    access_token = Authorize.create_access_token(subject=user.email)
-    refresh_token = Authorize.create_refresh_token(subject=user.email)
-    return {"user": u[0], "access_token": access_token, "refresh_token": refresh_token}
+    access_token = Authorize.create_access_token(
+        subject=user.email,
+        user_claims=get_user_claims(
+            {"id": user_from_db.id, "email": user_from_db.email}
+        ),
+    )
+    refresh_token = Authorize.create_refresh_token(
+        subject=user.email,
+        user_claims=get_user_claims(
+            {"id": user_from_db.id, "email": user_from_db.email}
+        ),
+    )
+    return {
+        "user": user_from_db,
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+    }
 
 
 @router.post("/refresh", dependencies=[Depends(FastapiJwtAuthRefreshBearer())])
-def refresh_access_token(Authorize: AuthJWT = Depends()) -> AccessToken:
+async def refresh_access_token(
+    Authorize: AuthJWT = Depends(), session: AsyncSession = Depends(get_session)
+) -> AccessToken:
     current_user = Authorize.get_jwt_subject()
-    new_access_token = Authorize.create_access_token(subject=current_user)
+    user_from_db = await get_user_by_email(session=session, email=current_user)
+    new_access_token = Authorize.create_access_token(
+        subject=current_user, user_claims=get_user_claims(user_from_db.dict())
+    )
     return {"access_token": new_access_token}

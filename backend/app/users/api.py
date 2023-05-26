@@ -1,17 +1,19 @@
 from typing import List
 
-from fastapi import Depends, Depends, APIRouter, UploadFile, HTTPException
+from fastapi import Depends, APIRouter, UploadFile, HTTPException
 from fastapi.responses import FileResponse
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 from fastapi_jwt_auth import AuthJWT
-import aiofiles
 
 from app.db import get_session
 from app.users.models import User
 from app.users.schemas import ReturnUser
 from app.auth.auth_fastapi_jwt_auth_bearer import FastapiJwtAuthBearer
+from app.users.functions import get_user_by_email, get_user_by_id, save_profile_img
+from app.settings import SETTINGS
+
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -19,7 +21,6 @@ router = APIRouter(prefix="/users", tags=["users"])
 @router.get(
     "/users",
     dependencies=[Depends(FastapiJwtAuthBearer())],
-    response_model=list[ReturnUser],
 )
 async def get_users(
     session: AsyncSession = Depends(get_session),
@@ -35,64 +36,36 @@ async def get_users(
 @router.get(
     "/user",
     dependencies=[Depends(FastapiJwtAuthBearer())],
-    response_model=ReturnUser,
 )
 async def get_users(
-    user_id: int,
-    session: AsyncSession = Depends(get_session),
+    user_id: int, session: AsyncSession = Depends(get_session)
 ) -> ReturnUser:
-    query = await session.execute(select(User).where(User.id == user_id))
-    users = query.scalars().all()
-    u = [
-        User(
-            id=user.id,
-            email=user.email,
-            password=user.password,
-            profile_img=user.profile_img,
-        )
-        for user in users
-    ]
-    if len(u) > 1:
-        raise HTTPException(
-            status_code=500, detail="Server error. More then one user found"
-        )
+    user = await get_user_by_id(session=session, id=user_id)
 
-    return ReturnUser(id=u[0].id, email=u[0].email, profile_img=u[0].profile_img)
+    return ReturnUser(id=user.id, email=user.email, profile_img=user.profile_img)
 
 
 @router.post("/profile-img/", dependencies=[Depends(FastapiJwtAuthBearer())])
-async def create_upload_file(
+async def set_user_profile_image(
     file: UploadFile,
     session: AsyncSession = Depends(get_session),
     Authorize: AuthJWT = Depends(),
 ):
-    # TODO: fix file name and file path
     current_user = Authorize.get_jwt_subject()
-    file_name = f"/usr/src/data_base/user_profile_img/{current_user}.{file.filename}"
-
-    async with aiofiles.open(file_name, "wb+") as out_file:
-        while content := await file.read(1024):
-            await out_file.write(content)
-    img_url = f"{current_user}.{file.filename}"
-    query = await session.execute(select(User).where(User.email == current_user))
-
-    query.scalar_one().profile_img = img_url
+    user = await get_user_by_email(session=session, email=current_user)
+    file_name = await save_profile_img(file)
 
     try:
+        user.profile_img = file_name
         await session.commit()
     except IntegrityError as exc:
-        # TODO: correct error messages
-        print(exc)
-        raise HTTPException(status_code=422)
-    except Exception as exc:
-        print(exc)
-        raise HTTPException(status_code=422, detail=exc)
+        raise HTTPException(status_code=422, detail=f"{exc=}")
 
-    return {"url": img_url}
+    return {"url": file_name}
 
 
 @router.get("/profile-img/", dependencies=[Depends(FastapiJwtAuthBearer())])
 async def get_profile_img(url: str, Authorize: AuthJWT = Depends()):
     Authorize.get_jwt_subject()
-    file_path = f"/usr/src/data_base/user_profile_img/{url}"
+    file_path = f"{SETTINGS.user_profile_img}/{url}"
     return FileResponse(file_path)

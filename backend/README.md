@@ -9,7 +9,7 @@
 ## on deploy
 
 * rename `.env_example` to `.env`
-* in `.env` file edit `secret` field
+* in `.env` file edit `authjwt_secret_key` field
 
 ## commands
 

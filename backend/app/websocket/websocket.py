@@ -40,11 +40,11 @@ async def websocket_endpoint(
     *,
     websocket: WebSocket,
     token: Annotated[str, Depends(get_token)],
+    Authorize: AuthJWT = Depends()
 ):
-    if token == "":
-        raise NoTokenException
-
-    print(f"{token=}")
+    Authorize.jwt_required("websocket", token=token)
+    decoded_token = Authorize.get_raw_jwt(token)
+    print(f"{decoded_token=}")
     await manager.connect(websocket, token)
     try:
         while True:

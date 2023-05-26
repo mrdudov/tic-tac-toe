@@ -17,5 +17,8 @@ class ConnectionManager:
         self.active_connections.remove((websocket, token))
 
     async def send_online_users_list(self, websocket: WebSocket):
+        await websocket.send_text(self._get_users_list_str())
+
+    def _get_users_list_str(self):
         online_users_list = str([item[1] for item in self.active_connections])
-        await websocket.send_text(online_users_list)
+        return online_users_list 

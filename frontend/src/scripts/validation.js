@@ -1,21 +1,24 @@
-import '../styles/reset.css'
-import '../styles/registration.css'
+import '../styles/reset.css';
+import '../styles/registration.css';
+
+const submitBtn = document.querySelector('.registration__btn');
+const emailInput = document.querySelector('.input-email');
+const passwordInput = document.querySelector('.input-password');
+const invalidNameMsg = document.querySelector('.registration__invalid-name');
 
 function validateNickname(name) {
-  const invalidNameMsg = document.querySelector('.registration__invalid-name');
-  
-  if (!/^[a-zA-Z0-9]+$/.test(name)) {
-    invalidNameMsg.textContent = 'You can only use letters and numbers';
+  if (name === '') {
+    invalidNameMsg.textContent = 'Please enter your email';
     return false;
   }
 
-  if (name.length < 3) {
-    invalidNameMsg.textContent = 'At least 3 characters';
+  if (!/^[\w.-]+@[a-zA-Z_-]+?(?:\.[a-zA-Z]{2,})+$/.test(name)) {
+    invalidNameMsg.textContent = 'Invalid email format';
     return false;
   }
 
-  if (name.length > 10) {
-    invalidNameMsg.textContent = 'Maximum 10 characters';
+  if (name.length > 30) {
+    invalidNameMsg.textContent = 'Maximum 30 characters';
     return false;
   }
 
@@ -23,31 +26,53 @@ function validateNickname(name) {
   return true;
 }
 
-const submitBtn = document.querySelector('.registration__btn');
-const nameInput = document.querySelector('.registration__input');
+function validatePassword(password) {
+  if (password === '') {
+    invalidNameMsg.textContent = 'Please enter your password';
+    return false;
+  }
+
+  return true;
+}
 
 submitBtn.addEventListener('click', (event) => {
-event.preventDefault();
-const name = nameInput.value.trim();
+  event.preventDefault();
+  const email = emailInput.value.trim();
+  const password = passwordInput.value.trim();
 
-if (validateNickname(name)) {
-  localStorage.setItem('myName', name)
-  window.location.href = './players_list.html'
-  return addPlayerNameToServer()
-}
+  try {
+    if (!validateNickname(email)) {
+      console.log('email error')
+      return;
+    }
+
+    if (!validatePassword(password)) {
+      console.log('password error')
+      return;
+    }
+
+    const response = fetch('http://tic-tac-toe.mrdudov.ru/api/v1/auth/register', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        email: email,
+        password: password
+      })
+    });
+
+    if (response.ok) {
+      const data = response.json();
+      localStorage.setItem('accessToken', data.access_token);
+      localStorage.setItem('refreshToken', data.access_token);
+      localStorage.setItem('myEmail', email)
+      window.location.href = './login.html';
+    } else {
+      invalidNameMsg.textContent = 'This user is already registered'
+    }
+  } catch (error) {
+    invalidNameMsg.textContent = error;
+  }
 });
-
-// REQUSET URL ДЖОКЪДУ
-function addPlayerNameToServer() {
-  const requestBody = { 'name': nameInput.value }; 
-  fetch(requestURL, { 
-    method: 'POST', 
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(requestBody)
-  })
-  .then(response => response.json())
-  .then(data => console.log(data))
-  .catch(error => console.error(error));
-}

@@ -115,5 +115,5 @@ restartBtn.addEventListener('click', () => {
 const myName = document.querySelector('.my-name');
 const opponentsName = document.querySelector('.opponent-name');
 
-myName.textContent = localStorage.getItem('myName')
+myName.textContent = localStorage.getItem('myEmail')
 opponentsName.textContent = localStorage.getItem('opponentsName')

@@ -1,24 +1,41 @@
 import '../styles/reset.css'
 import '../styles/players_list.css'
 
-async function getPlayersNames() {
-  const playersList = document.querySelector('.players__list');  
-  let response = await fetch('http://tic-tac-toe.mrdudov.ru/api/v1/users');
-  let result = await response.json();
-  
-  for (let key in result) {
-    let playerName = result[key]['name'];
-    
-    playersList.innerHTML += `<a href="./gameboard.html" class="player">${playerName}</a>`;
-    
-  }
+const playersList = document.querySelector('.players__list');
 
-  const players = document.querySelectorAll('.player');
-  players.forEach(player => {
-    player.addEventListener('click', (event) => {
-      localStorage.setItem('opponentsName', event.target.textContent.trim());
+async function getPlayersNames() {
+  try {
+    const response = await fetch('http://tic-tac-toe.mrdudov.ru/api/v1/users/users', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
     });
-  });
-}
-  
-getPlayersNames();
+
+    if (!response.ok) {
+      throw new Error('Ошибка при выполнении запроса');
+    }
+
+    const result = await response.json();
+
+    result.forEach(item => {
+      playersList.innerHTML += `<a href="./gameboard.html" class="player">${item.email}</a>`;
+    });
+
+    const players = document.querySelectorAll('.player');
+    players.forEach(player => {
+      player.addEventListener('click', (event) => {
+        localStorage.setItem('opponentsName', event.target.textContent.trim());
+      });
+    });
+
+  } catch (error) {
+    console.log('Произошла ошибка:', error);
+  }
+};
+
+
+
+  getPlayersNames()

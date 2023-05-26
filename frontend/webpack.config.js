@@ -17,7 +17,8 @@ module.exports = {
     index: './scripts/index.js',
     gameboard: './scripts/gameboard.js',
     registration : './scripts/validation.js',
-    players_list: './scripts/players_list.js'
+    players_list: './scripts/players_list.js',
+    login: './scripts/login.js'
   },
   output : {
     filename: '[name].[contenthash].js',
@@ -67,6 +68,14 @@ module.exports = {
         collapseWhitespace: isProd
       }
       }),
+    new HTMLWebpackPlugin({
+      filename: 'login.html',
+      template: './pages/login.html',
+      chunks: ['login'],
+      minify: {
+        collapseWhitespace: isProd
+      }
+    }),
       new CleanWebpackPlugin(),
 
       new MiniCssExtractPlugin({

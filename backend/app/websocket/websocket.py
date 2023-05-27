@@ -9,12 +9,12 @@ from fastapi import (
 from fastapi.responses import HTMLResponse
 from fastapi_jwt_auth import AuthJWT
 
-from app.websocket.connect_manager import ConnectionManager
+from app.websocket.connect_manager import OnlineUsersConnectionManager
 from app.websocket.functions import get_token
 from app.websocket.classes import OnlineUser
 
 
-manager = ConnectionManager()
+manager = OnlineUsersConnectionManager()
 router = APIRouter(prefix="/ws", tags=["ws"])
 
 
@@ -43,7 +43,6 @@ async def websocket_endpoint(
 ):
     Authorize.jwt_required("websocket", token=token)
     decoded_token = Authorize.get_raw_jwt(token)
-    print(f"{decoded_token=}")
     online_user = OnlineUser(websocket, decoded_token["user_id"], decoded_token)
     await manager.connect(online_user)
     await manager.users_count_changed_broadcast()

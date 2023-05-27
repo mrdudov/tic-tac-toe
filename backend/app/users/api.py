@@ -1,10 +1,9 @@
 from typing import List
 
-from fastapi import Depends, APIRouter, UploadFile, HTTPException
+from fastapi import Depends, APIRouter, UploadFile
 from fastapi.responses import FileResponse
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.exc import IntegrityError
 from fastapi_jwt_auth import AuthJWT
 
 from app.db import get_session
@@ -18,13 +17,8 @@ from app.settings import SETTINGS
 router = APIRouter(prefix="/users", tags=["users"])
 
 
-@router.get(
-    "/users",
-    dependencies=[Depends(FastapiJwtAuthBearer())],
-)
-async def get_users(
-    session: AsyncSession = Depends(get_session),
-) -> List[ReturnUser]:
+@router.get("/users", dependencies=[Depends(FastapiJwtAuthBearer())])
+async def get_users(session: AsyncSession = Depends(get_session)) -> List[ReturnUser]:
     result = await session.execute(select(User))
     users = result.scalars().all()
     return [
@@ -33,10 +27,7 @@ async def get_users(
     ]
 
 
-@router.get(
-    "/user",
-    dependencies=[Depends(FastapiJwtAuthBearer())],
-)
+@router.get("/user", dependencies=[Depends(FastapiJwtAuthBearer())])
 async def get_users(
     user_id: int, session: AsyncSession = Depends(get_session)
 ) -> ReturnUser:
@@ -55,11 +46,8 @@ async def set_user_profile_image(
     user = await get_user_by_email(session=session, email=current_user)
     file_name = await save_profile_img(file)
 
-    try:
-        user.profile_img = file_name
-        await session.commit()
-    except IntegrityError as exc:
-        raise HTTPException(status_code=422, detail=f"{exc=}")
+    user.profile_img = file_name
+    await session.commit()
 
     return {"url": file_name}
 

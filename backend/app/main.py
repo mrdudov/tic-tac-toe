@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi_jwt_auth.exceptions import AuthJWTException
 from fastapi_jwt_auth import AuthJWT
-
+from sqlalchemy.exc import IntegrityError
 
 from app.auth.api import router as auth_router
 from app.users.api import router as users_router
@@ -21,6 +21,11 @@ def get_config():
 app.include_router(auth_router)
 app.include_router(users_router)
 app.include_router(ws_router)
+
+
+@app.exception_handler(IntegrityError)
+def sqlalchemy_exception_handler(request: Request, exc: IntegrityError):
+    return JSONResponse(status_code=400, content={"detail": str(exc)})
 
 
 @app.exception_handler(AuthJWTException)

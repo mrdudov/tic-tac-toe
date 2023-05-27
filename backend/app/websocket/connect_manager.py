@@ -3,7 +3,7 @@ from app.websocket.exceptions import OnlineLimitException
 from app.websocket.classes import OnlineUser
 
 
-class ConnectionManager:
+class OnlineUsersConnectionManager:
     def __init__(self):
         self.online_users: list[OnlineUser] = []
 
@@ -17,18 +17,18 @@ class ConnectionManager:
         self.online_users.remove(online_user)
 
     async def send_online_users_list(self, online_user: OnlineUser):
-        await online_user.websocket.send_text(self._get_users_list_str())
+        await online_user.websocket.send_json(self._get_users_list())
 
-    def _get_users_list_str(self):
-        online_users_list = [
+    def _get_users_list(self):
+        return [
             {
                 "email": online_user.data["user_email"],
                 "user_id": online_user.data["user_id"],
             }
             for online_user in self.online_users
         ]
-        return str(online_users_list)
+        
     
     async def users_count_changed_broadcast(self):
         for online_user in self.online_users:
-            await online_user.websocket.send_text(self._get_users_list_str())
+            await self.send_online_users_list(online_user)

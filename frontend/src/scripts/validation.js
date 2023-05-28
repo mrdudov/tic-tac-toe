@@ -35,7 +35,7 @@ function validatePassword(password) {
   return true;
 }
 
-submitBtn.addEventListener('click', (event) => {
+submitBtn.addEventListener('click', async (event) => {
   event.preventDefault();
   const email = emailInput.value.trim();
   const password = passwordInput.value.trim();
@@ -51,7 +51,7 @@ submitBtn.addEventListener('click', (event) => {
       return;
     }
 
-    const response = fetch('http://tic-tac-toe.mrdudov.ru/api/v1/auth/register', {
+    const response = await fetch('http://tic-tac-toe.mrdudov.ru/api/v1/auth/register', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',

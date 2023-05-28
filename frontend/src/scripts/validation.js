@@ -35,7 +35,7 @@ function validatePassword(password) {
   return true;
 }
 
-submitBtn.addEventListener('click', async (event) => {
+submitBtn.addEventListener('click', async(event) => {
   event.preventDefault();
   const email = emailInput.value.trim();
   const password = passwordInput.value.trim();
@@ -62,17 +62,16 @@ submitBtn.addEventListener('click', async (event) => {
         password: password
       })
     });
-
     if (response.ok) {
-      const data = response.json();
+      const data = await response.json();
       localStorage.setItem('accessToken', data.access_token);
       localStorage.setItem('refreshToken', data.access_token);
       localStorage.setItem('myEmail', email)
-      window.location.href = './login.html';
+      window.location.href = './players_list.html';
     } else {
       invalidNameMsg.textContent = 'This user is already registered'
     }
   } catch (error) {
-    invalidNameMsg.textContent = error;
+    console.log(error)
   }
 });

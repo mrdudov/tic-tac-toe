@@ -3,7 +3,7 @@ import '../styles/players_list.css'
 
 const playersList = document.querySelector('.players__list');
 
-async function getPlayersNames() {
+(async ()=> {
   try {
     const response = await fetch('http://tic-tac-toe.mrdudov.ru/api/v1/users/users', {
       method: 'GET',
@@ -34,8 +34,4 @@ async function getPlayersNames() {
   } catch (error) {
     console.log('Произошла ошибка:', error);
   }
-};
-
-
-
-  getPlayersNames()
+})();

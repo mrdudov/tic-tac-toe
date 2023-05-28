@@ -22,22 +22,25 @@
 }
 
 .registration__section {
-    margin-bottom: 150px;
-    width: 820px;
-    height: 550px;
-    background: url(../assets/images/registation_card_bg.jpg) no-repeat;
+    /* margin-bottom: 150px; */
+    width: 800px;
+    height: 600px;
+    /* overflow: hidden; */
+    background: url(../assets/images/registation_card_bg2.jpg) no-repeat;
     background-size: 100%;
-    border-radius: 15px 15px 100px 100px;
+    border-radius: 15px;
     box-shadow: 0px -10px 250px 25px rgba(0,0,0,0.51) inset;
 }
 
 .registration__form {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    position: relative;
-    top: 350px;
+  position: relative;
+  top: 300px;
+  background-color: rgba(44, 38, 33, 0.356);
+	backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  height: 320px;
 }
 
 .input-email {
@@ -63,21 +66,21 @@
   cursor: pointer;
 }
   
-  .input-email::placeholder {
-      color: rgb(90, 0, 0);
-      text-shadow:0px 1px 0 rgb(255,255,255),0px -1px 0 rgb(255,255,255),1px 0px 0 rgb(255,255,255),-1px 0px 0 rgb(255,255,255),1px 1px 0 rgb(255,255,255),1px -1px 0 rgb(255,255,255),-1px 1px 0 rgb(255,255,255),-1px -1px 0 rgb(255,255,255),0px 2px 0 rgb(255,255,255),0px -2px 0 rgb(255,255,255),2px 0px 0 rgb(255,255,255),-2px 0px 0 rgb(255,255,255),2px 2px 0 rgb(255,255,255),2px -2px 0 rgb(255,255,255),-2px 2px 0 rgb(255,255,255),-2px -2px 0 rgb(255,255,255);
-      font-size: 45px;
-  }
-  
-  .input-email:focus::placeholder {
-      color: transparent;
-      text-shadow: none;
-  }
-  
-  .input-email:focus {
-      cursor: text;
-      outline: 5px double bisque;
-  }
+.input-email::placeholder {
+  color: rgb(90, 0, 0);
+  text-shadow:0px 1px 0 rgb(255,255,255),0px -1px 0 rgb(255,255,255),1px 0px 0 rgb(255,255,255),-1px 0px 0 rgb(255,255,255),1px 1px 0 rgb(255,255,255),1px -1px 0 rgb(255,255,255),-1px 1px 0 rgb(255,255,255),-1px -1px 0 rgb(255,255,255),0px 2px 0 rgb(255,255,255),0px -2px 0 rgb(255,255,255),2px 0px 0 rgb(255,255,255),-2px 0px 0 rgb(255,255,255),2px 2px 0 rgb(255,255,255),2px -2px 0 rgb(255,255,255),-2px 2px 0 rgb(255,255,255),-2px -2px 0 rgb(255,255,255);
+  font-size: 45px;
+}
+
+.input-email:focus::placeholder {
+  color: transparent;
+  text-shadow: none;
+}
+
+.input-email:focus {
+  cursor: text;
+  outline: 5px double bisque;
+}
 
 .registration__btn {
   height: 50px;
@@ -110,6 +113,28 @@
                 0 1px 6px rgba(0,0,0,.4),
                 inset 0 1px rgba(255,255,255,.3),
                 inset 0 0 3px rgba(255,255,255,.5);
+}
+
+.login__text {
+  font-size: 25px;
+  margin-top: 40px;
+  color:rgb(31, 7, 0);
+}
+
+.login__link {
+  font-size: 25px;
+  text-decoration: none;
+  font-family: 'Woodcut';
+  margin-left: 10px;
+  color: rgb(23, 85, 18);
+  background-color: rgba(205, 218, 199, 0.74);
+  padding: 5px 15px;
+  border-radius: 20px;
+}
+
+.login__link:hover {
+  background-color: rgb(18, 65, 14);
+  color:rgba(205, 218, 199, 0.74);
 }
 
 .registration__invalid-name {

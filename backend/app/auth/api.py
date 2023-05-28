@@ -1,5 +1,4 @@
 from fastapi import HTTPException, Depends, APIRouter
-from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 from fastapi_jwt_auth import AuthJWT
@@ -25,10 +24,9 @@ async def register_user(
     hashed_password = hash_password(user.password)
     user = User(email=user.email, password=hashed_password)
     session.add(user)
-    try:
-        await session.commit()
-    except IntegrityError as exc:
-        raise HTTPException(status_code=422, detail=f"{exc=}")
+
+    await session.commit()
+
     await session.refresh(user)
     access_token = Authorize.create_access_token(
         subject=user.email, user_claims=get_user_claims(user.dict())
@@ -55,18 +53,21 @@ async def login(
         password=user.password, hashed_password=user_from_db.password.encode("utf-8")
     ):
         raise HTTPException(status_code=401, detail="Bad password")
+
     access_token = Authorize.create_access_token(
         subject=user.email,
         user_claims=get_user_claims(
             {"id": user_from_db.id, "email": user_from_db.email}
         ),
     )
+
     refresh_token = Authorize.create_refresh_token(
         subject=user.email,
         user_claims=get_user_claims(
             {"id": user_from_db.id, "email": user_from_db.email}
         ),
     )
+
     return {
         "user": user_from_db,
         "access_token": access_token,

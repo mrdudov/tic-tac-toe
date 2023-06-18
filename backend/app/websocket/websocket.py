@@ -15,7 +15,7 @@ from app.websocket.classes import OnlineUser
 
 
 manager = OnlineUsersConnectionManager()
-router = APIRouter(prefix="/ws", tags=["ws"])
+router = APIRouter(tags=["ws"])
 
 
 html = """
@@ -29,12 +29,12 @@ html = """
 """
 
 
-@router.get("/")
-async def get():
-    return HTMLResponse(html)
+#@router.get("/")
+#async def get():
+#    return HTMLResponse(html)
 
 
-@router.websocket("/online_users")
+@router.websocket("/api/v1/ws")
 async def websocket_endpoint(
     *,
     websocket: WebSocket,

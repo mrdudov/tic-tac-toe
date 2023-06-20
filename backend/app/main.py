@@ -10,7 +10,7 @@ from app.websocket.websocket import router as ws_router
 from app.settings import SETTINGS
 
 
-app = FastAPI()
+app = FastAPI(root_path="/api/v1")
 
 
 @AuthJWT.load_config
@@ -20,7 +20,7 @@ def get_config():
 
 app.include_router(auth_router)
 app.include_router(users_router)
-app.include_router(ws_router)
+#app.include_router(ws_router)
 
 
 @app.websocket("/api/v1/ws")

@@ -1,0 +1,5 @@
+site_name: tic-tac-toe
+site_url: http://tic-tac-toe.mrdudov.ru/
+nav:
+    - Home: index.md
+    - websocket: websocket.md

@@ -3,10 +3,8 @@ from typing import Annotated
 from fastapi import (
     Depends,
     WebSocket,
-    APIRouter,
     WebSocketDisconnect,
 )
-from fastapi.responses import HTMLResponse
 from fastapi_jwt_auth import AuthJWT
 
 from app.websocket.connect_manager import OnlineUsersConnectionManager
@@ -15,27 +13,25 @@ from app.websocket.classes import OnlineUser
 
 
 manager = OnlineUsersConnectionManager()
-router = APIRouter(tags=["ws"])
 
 
 html = """
-    var url = "ws://localhost:8080/ws"
-    var token = "some_token"
-    ws = new WebSocket(`${url}/online_users?token=${token}`)
+    let ws = new WebSocket("ws://tic-tac-toe.mrdudov.ru/api/v1/ws")
+    let ws = new WebSocket("ws://localhost:8080/ws")
     ws.onmessage = function(event) { console.log(event.data) }
     ws.send('get_online_users')
-
-    // ws.close(
+    ws.close()
 """
 
 
-#@router.get("/")
-#async def get():
-#    return HTMLResponse(html)
+async def connections_handler(websocket: WebSocket):
+    await websocket.accept()
+    while True:
+        data = await websocket.receive_text()
+        await websocket.send_text(f"Message text was: {data}")
 
 
-@router.websocket("/api/v1/ws")
-async def websocket_endpoint(
+async def online_users(
     *,
     websocket: WebSocket,
     token: Annotated[str, Depends(get_token)],

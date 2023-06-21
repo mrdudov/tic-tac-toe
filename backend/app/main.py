@@ -6,7 +6,7 @@ from sqlalchemy.exc import IntegrityError
 
 from app.auth.api import router as auth_router
 from app.users.api import router as users_router
-from app.websocket.websocket import router as ws_router
+from app.websocket.handlers import connections_handler
 from app.settings import SETTINGS
 
 
@@ -20,15 +20,11 @@ def get_config():
 
 app.include_router(auth_router)
 app.include_router(users_router)
-#app.include_router(ws_router)
 
 
 @app.websocket("/api/v1/ws")
 async def websocket_endpoint(websocket: WebSocket):
-    await websocket.accept()
-    while True:
-        data = await websocket.receive_text()
-        await websocket.send_text(f"Message text was: {data}")
+    await connections_handler(websocket)
 
 
 @app.exception_handler(IntegrityError)

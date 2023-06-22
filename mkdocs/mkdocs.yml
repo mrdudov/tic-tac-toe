@@ -2,4 +2,5 @@ site_name: tic-tac-toe
 site_url: http://tic-tac-toe.mrdudov.ru/
 nav:
     - Home: index.md
-    - websocket: websocket.md
+    - ws connection: ws_connection.md
+    - Online users: ws_online_users.md

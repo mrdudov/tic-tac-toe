@@ -1,4 +1,4 @@
-# WebSocket Example
+# WebSocket connection Example
 
 ## On prod
 

@@ -1,52 +1,75 @@
-from typing import Annotated
+from json import JSONDecodeError
+import logging
 
 from fastapi import (
-    Depends,
     WebSocket,
     WebSocketDisconnect,
 )
 from fastapi_jwt_auth import AuthJWT
+from fastapi_jwt_auth.exceptions import JWTDecodeError
+from jwt.exceptions import ExpiredSignatureError
 
 from app.websocket.connect_manager import OnlineUsersConnectionManager
-from app.websocket.functions import get_token
 from app.websocket.classes import OnlineUser
+from app.websocket.exceptions import NoTokenException
 
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 manager = OnlineUsersConnectionManager()
 
 
-html = """
-    let ws = new WebSocket("ws://tic-tac-toe.mrdudov.ru/api/v1/ws")
-    let ws = new WebSocket("ws://localhost:8080/ws")
-    ws.onmessage = function(event) { console.log(event.data) }
-    ws.send('get_online_users')
-    ws.close()
-"""
-
-
 async def connections_handler(websocket: WebSocket):
     await websocket.accept()
-    while True:
-        data = await websocket.receive_text()
-        await websocket.send_text(f"Message text was: {data}")
-
-
-async def online_users(
-    *,
-    websocket: WebSocket,
-    token: Annotated[str, Depends(get_token)],
-    Authorize: AuthJWT = Depends(),
-):
-    Authorize.jwt_required("websocket", token=token)
-    decoded_token = Authorize.get_raw_jwt(token)
-    online_user = OnlineUser(websocket, decoded_token["user_id"], decoded_token)
-    await manager.connect(online_user)
-    await manager.users_count_changed_broadcast()
     try:
         while True:
-            data = await websocket.receive_text()
-            if data == "get_online_users":
-                await manager.send_online_users_list(online_user)
-    except WebSocketDisconnect:
-        manager.disconnect(online_user)
+            data = await websocket.receive_json()
+
+            if not data.get("access_token"):
+                raise NoTokenException
+            try:
+                Authorize = AuthJWT()
+                decoded_token = Authorize.get_raw_jwt(data["access_token"])
+
+            except JWTDecodeError as e:
+                await websocket.send_json({"error": "JWTDecodeError"})
+                logger.exception("JWTDecodeError")
+                continue
+
+            except ExpiredSignatureError as e:
+                await websocket.send_json({"error": "ExpiredSignatureError"})
+                logger.exception("ExpiredSignatureError")
+                continue
+
+            if data["end_point"] == "online_users":
+                online_user = OnlineUser(
+                    websocket, decoded_token["user_id"], decoded_token
+                )
+
+                if data["query"] == "online":
+                    manager.add(online_user)
+                    await manager.users_count_changed_broadcast()
+
+                if data["query"] == "offline":
+                    manager.remove(online_user)
+                    await manager.users_count_changed_broadcast()
+
+                if data["query"] == "get_list":
+                    await manager.send_online_users_list(online_user)
+
+    except WebSocketDisconnect as e:
+        logger.exception("WebSocketDisconnect")
+
+    except JSONDecodeError as e:
+        logger.exception("JSONDecodeError")
+
+    except NoTokenException as e:
+        logger.exception("NoTokenException")
+
+    except Exception as e:
+        logger.exception("exc")
+        
+    finally:
+        manager.disconnect(websocket)
         await manager.users_count_changed_broadcast()

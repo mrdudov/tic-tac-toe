@@ -7,6 +7,7 @@
         "fastapi",
         "gensalt",
         "hashpw",
+        "mrdudov",
         "pydantic",
         "sessionmaker",
         "sqlalchemy",

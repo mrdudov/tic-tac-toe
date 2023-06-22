@@ -10,7 +10,7 @@ from app.websocket.handlers import connections_handler
 from app.settings import SETTINGS
 
 
-app = FastAPI(root_path="/api/v1")
+app = FastAPI()
 
 
 @AuthJWT.load_config

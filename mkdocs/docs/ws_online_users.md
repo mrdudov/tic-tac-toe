@@ -7,7 +7,7 @@ let access_token = "access token"
 
 let data = {
     end_point: "online_users",
-    query: "get_online_users",
+    query: "get_list",
     access_token: access_token
 }
 
